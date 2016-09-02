@@ -40,7 +40,14 @@ app.get('/account', (req, res) => res.render('account.html'));
  * the anticipated URL of the image.
  */
 app.get('/sign-s3', (req, res) => {
-  const s3 = new aws.S3();
+  const s3 = new aws.S3({
+    endpoint: 'http://localhost:8000',
+    apiVersions: { s3: '2006-03-01' },
+    signatureCache: false,
+    signatureVersion: 'v4',
+    region: 'us-east-1',
+    s3ForcePathStyle: true,
+  });
   const fileName = req.query['file-name'];
   const fileType = req.query['file-type'];
   const s3Params = {
@@ -58,7 +65,7 @@ app.get('/sign-s3', (req, res) => {
     }
     const returnData = {
       signedRequest: data,
-      url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
+      url: `http://localhost:8000/${S3_BUCKET}/${fileName}`
     };
     res.write(JSON.stringify(returnData));
     res.end();
